@@ -4,14 +4,14 @@ import { ChannelEvent } from '../../app/models/channelevent';
 import { Observable,Subject } from 'rxjs/Rx';
 
 export class Chat {
-	channelId: String = ""
-	callId: String = ""
-	agentEmail: String = ""
-	userId: String = ""
-	userFullname: String = ""
-	@Input() status: String = ""
+    channelId: String = ""
+    callId: String = ""
+    agentEmail: String = ""
+    userId: String = ""
+    userFullname: String = ""
+    @Input() status: String = ""
 
-	public messages: Subject<Array<Message>>
+    public messages: Subject<Array<Message>>
 
 
     constructor() {

@@ -1,6 +1,7 @@
 import { Injectable, Inject } from '@angular/core';
 import { Http,Headers,RequestOptions } from "@angular/http";
 import { ChannelEvent } from '../../app/models/channelevent';
+import { CallEvent } from '../../app/models/callevent';
 import { Chat } from '../../app/models/chat';
 import { Observable,Subject } from 'rxjs/Rx';
 
@@ -33,28 +34,52 @@ export class DataService {
         return null;
     }
 
+    public acceptPersistentInteraction(callId: String, type: String) {
+        let options = new RequestOptions({
+            withCredentials: true
+        });
+        return this.$http.get("https://interactify.io/im/calls/persistentaccept?callid=" + callId + "&type=" + type,options);       
+    }
+
+    public handleCallEvent(callEvent: CallEvent) {
+        alert(callEvent.event);
+        switch ( callEvent.event ) {
+            case 'persistent_prering':
+                    // prering event can either be on voice or on a non-voice interaction
+                    this.acceptPersistentInteraction(callEvent.callId, callEvent.interactionType).subscribe( result => {} );
+                break;
+       }       
+    }
+
+    public handleChannelEvent(channelEvent: ChannelEvent) {
+        let chat: Chat = new Chat()
+        // when the channel is initialized, add a new interaction
+        if ( channelEvent.interactionType == "chat" ) {
+            if ( channelEvent.status == "init" ) {
+                chat.fromChannelEvent(channelEvent);
+                this.chats.push(chat);
+                this.chatsSubject.next(this.chats);
+            } else {
+                let interaction = this.findInteraction(channelEvent.id);
+                interaction.status = channelEvent.status;
+            }
+        }       
+    }
+
     public processMessage(evt) {
         let received_msg = evt.data;
         let data = JSON.parse(received_msg);
-        let channelEvent: ChannelEvent = new ChannelEvent()
-        let chat: Chat = new Chat()
         //alert(received_msg);
         switch(data.message) {
             case "call_event":
+                    let callEvent: CallEvent = new CallEvent();
+                    callEvent.fromJson(data);    
+                    this.handleCallEvent(callEvent);        
                 break;
             case "channel_event":
-                channelEvent.fromJson(data);
-                // when the channel is initialized, add a new interaction
-                if ( channelEvent.interactionType == "chat" ) {
-                    if ( channelEvent.status == "init" ) {
-                        chat.fromChannelEvent(channelEvent);
-                        this.chats.push(chat);
-                        this.chatsSubject.next(this.chats);
-                    } else {
-                        let interaction = this.findInteraction(channelEvent.id);
-                        interaction.status = channelEvent.status;
-                    }
-                }
+                    let channelEvent: ChannelEvent = new ChannelEvent();
+                    channelEvent.fromJson(data);
+                    this.handleChannelEvent(data);
                 break;
             case "chat_message":
                 break;

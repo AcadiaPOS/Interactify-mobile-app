@@ -1,0 +1,15 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>Home</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+  <h2>Chats list</h2>
+  <div *ngFor="let chat of chats">
+    <p>
+      Chat from: {{chat.userFullname}}<br/>
+      Status: {{chat.status}}
+    </p>
+  </div>
+</ion-content>

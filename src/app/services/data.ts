@@ -3,6 +3,7 @@ import { Http,Headers,RequestOptions } from "@angular/http";
 import { ChannelEvent } from '../../app/models/channelevent';
 import { CallEvent } from '../../app/models/callevent';
 import { Chat } from '../../app/models/chat';
+import { Message } from '../../app/models/message';
 import { Observable,Subject } from 'rxjs/Rx';
 
 @Injectable()
@@ -27,9 +28,16 @@ export class DataService {
         return this.$http.post("https://interactify.io/login?stop_success_redirect=1","username=evg&password=test1234",options);
     }
 
-    public findInteraction(interactionId) {
+    public findChatByChannelId(channelId) {
         for (let chat of this.chats) {
-            if(chat.channelId == interactionId) return chat;
+            if(chat.channelId == channelId) return chat;
+        }        
+        return null;
+    }
+
+    public findChatByInteractionId(interactionId) {
+        for (let chat of this.chats) {
+            if(chat.callId == interactionId) return chat;
         }        
         return null;
     }
@@ -60,10 +68,16 @@ export class DataService {
                 this.chats.push(chat);
                 this.chatsSubject.next(this.chats);
             } else {
-                let interaction = this.findInteraction(channelEvent.id);
+                let interaction = this.findChatByChannelId(channelEvent.id);
                 interaction.status = channelEvent.status;
             }
         }       
+    }
+
+    public handleChatMessage(chatMessage: Message) {
+        let chat: Chat = this.findChatByInteractionId(chatMessage.interaction_id);
+        chat.messages.push(chatMessage);
+        chat.messagesSubj.next(chat.messages);
     }
 
     public processMessage(evt) {
@@ -79,9 +93,12 @@ export class DataService {
             case "channel_event":
                     let channelEvent: ChannelEvent = new ChannelEvent();
                     channelEvent.fromJson(data);
-                    this.handleChannelEvent(data);
+                    this.handleChannelEvent(channelEvent);
                 break;
             case "chat_message":
+                    let chatMessage: Message = new Message();
+                    chatMessage.fromJson(data);
+                    this.handleChatMessage(chatMessage);
                 break;
             case "queue_event":
                 break;

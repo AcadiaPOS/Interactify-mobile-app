@@ -6,7 +6,7 @@
 
 <ion-content padding>
   <h2>Chats list</h2>
-  <div *ngFor="let chat of chats">
+  <div *ngFor="let chat of chats" (click)="openChat(chat)">
     <p>
       Chat from: {{chat.userFullname}}<br/>
       Status: {{chat.status}}

@@ -4,6 +4,7 @@ import { MyApp } from './app.component';
 import { HistoryPage } from '../pages/history/history';
 import { ActivePage } from '../pages/active/active';
 import { TabsPage } from '../pages/tabs/tabs';
+import { ChatPage } from '../pages/chat/chat';
 import { DataService } from '../app/services/data';
 
 @NgModule({
@@ -11,7 +12,8 @@ import { DataService } from '../app/services/data';
     MyApp,
     HistoryPage,
     ActivePage,
-    TabsPage
+    TabsPage,
+    ChatPage
   ],
   imports: [
     IonicModule.forRoot(MyApp)
@@ -21,7 +23,8 @@ import { DataService } from '../app/services/data';
     MyApp,
     HistoryPage,
     ActivePage,
-    TabsPage
+    TabsPage,
+    ChatPage
   ],
   providers: [{provide: ErrorHandler, useClass: IonicErrorHandler}, DataService]
 })

@@ -11,7 +11,8 @@ export class Chat {
     userFullname: String = ""
     @Input() status: String = ""
 
-    public messages: Subject<Array<Message>>
+    public messages: Array<Message> = new Array<Message>()
+    public messagesSubj: Subject<Array<Message>> = new Subject<Array<Message>>()
 
 
     constructor() {

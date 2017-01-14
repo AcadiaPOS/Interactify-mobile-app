@@ -1,0 +1,16 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>Chat</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content>
+    <p>
+        Chat with {{chat.userFullname}}, status: {{chat.status}}
+    </p>
+    <div *ngFor="let message of chat.messagesSubj | async">
+        <div>
+        	{{message.text}}
+        </div>
+    </div>
+</ion-content>

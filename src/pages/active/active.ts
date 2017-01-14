@@ -23,8 +23,8 @@ export class ActivePage {
     }
 
     public openChat(chat: Chat) {
-    	let chatPage = new ChatPage(this.navCtrl, chat);
-        this.navCtrl.push(chatPage);
+      this.navCtrl.push(ChatPage, {chat: chat});
+      chat.messagesSubj.next(chat.messages);
     }
 
 }

@@ -8,9 +8,17 @@
     <p>
         Chat with {{chat.userFullname}}, status: {{chat.status}}
     </p>
-    <div *ngFor="let message of chat.messagesSubj | async">
-        <div>
+    <div>
+        <input type="text" name="message" id="message" [(ngModel)]="currentMessage"/>
+        <button (click)="sendMessage()">Send</button>
+    </div>    
+    <div *ngFor="let message of chat.messagesSubj | async" style="overflow: hidden;">
+        <div *ngIf="chat.agentEmail == message.sender_id" class="bubble left">
         	{{message.text}}
         </div>
+        <div *ngIf="chat.agentEmail != message.sender_id" class="bubble right">
+            {{message.text}}
+        </div>        
     </div>
+
 </ion-content>

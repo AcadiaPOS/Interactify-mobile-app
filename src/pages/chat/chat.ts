@@ -2,18 +2,36 @@ import { Component, Input } from '@angular/core';
 import { NavController, NavParams } from 'ionic-angular';
 import { DataService } from '../../app/services/data';
 import { Chat } from '../../app/models/chat';
+import { Message } from '../../app/models/message';
 
 @Component({
   selector: 'page-chat',
-  templateUrl: 'chat.html'
+  templateUrl: 'chat.html',
+  providers: [ DataService ]
 })
 export class ChatPage {
 
     chat: Chat
+    currentMessage: String
 
-    constructor(public navCtrl: NavController, public navParams: NavParams) {
+    constructor(public navCtrl: NavController, public navParams: NavParams, public dataService: DataService) {
       let self = this;
       self.chat = navParams.get('chat');
+    }
+
+    public sendMessage() {
+        let message = new Message();
+        let chat = this.chat;
+        alert('Sending ' + this.currentMessage);
+        message.interaction_id = this.chat.callId;
+        message.sender = this.chat.agentEmail;
+        message.sender_id = this.chat.agentEmail;
+        message.text = this.currentMessage;
+        message.ts = (new Date()).getUTCSeconds().toString();
+        this.dataService.sendChatMessage(message).subscribe( result => {
+    	    chat.messages.push(message);
+    	    chat.messagesSubj.next(chat.messages);
+        });
     }
 
 }

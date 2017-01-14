@@ -50,7 +50,6 @@ export class DataService {
     }
 
     public handleCallEvent(callEvent: CallEvent) {
-        alert(callEvent.event);
         switch ( callEvent.event ) {
             case 'persistent_prering':
                     // prering event can either be on voice or on a non-voice interaction
@@ -59,25 +58,60 @@ export class DataService {
        }       
     }
 
-    public handleChannelEvent(channelEvent: ChannelEvent) {
-        let chat: Chat = new Chat()
+   public handleChannelEvent(channelEvent: ChannelEvent) {
+        let chat: Chat = new Chat();
         // when the channel is initialized, add a new interaction
-        if ( channelEvent.interactionType == "chat" ) {
-            if ( channelEvent.status == "init" ) {
-                chat.fromChannelEvent(channelEvent);
-                this.chats.push(chat);
-                this.chatsSubject.next(this.chats);
-            } else {
+        switch(channelEvent.status) {
+            case "init":
+                    chat.fromChannelEvent(channelEvent);
+                    this.chats.push(chat);
+                    this.chatsSubject.next(this.chats);                
+                break;
+            case "channel_died":
+                    chat.fromChannelEvent(channelEvent);
+                    this.chats = this.chats.filter(value => {
+                        return value.channelId != chat.channelId;
+                    });
+                    this.chatsSubject.next(this.chats);
+                break;
+            default:
                 let interaction = this.findChatByChannelId(channelEvent.id);
-                interaction.status = channelEvent.status;
-            }
-        }       
+                interaction.status = channelEvent.status;  
+        }
     }
 
     public handleChatMessage(chatMessage: Message) {
         let chat: Chat = this.findChatByInteractionId(chatMessage.interaction_id);
         chat.messages.push(chatMessage);
         chat.messagesSubj.next(chat.messages);
+    }
+
+    public sendChatMessage(chatMessage: Message) {
+        let headers = new Headers();
+        headers.append('Content-Type', 'application/x-www-form-urlencoded');
+        let options = new RequestOptions({
+            headers: headers,
+            withCredentials: true
+        });
+        return this.$http.post("https://interactify.io/im/chat/post","interaction_id="+chatMessage.interaction_id+"&message="+chatMessage.text,options);
+    }
+
+    public refreshInteractions() {
+        let options = new RequestOptions({
+            withCredentials: true
+        });
+        this.chats = new Array<Chat>();
+        this.$http.get("https://interactify.io/im/json/channels", options).subscribe(result => {
+            let channels = result.json();
+            for(let jsonChat of channels as Array<any>) {
+                let chat = new Chat();
+                if (jsonChat.interactionType == "chat") {
+                    chat.fromChannelEvent(jsonChat);
+                    this.chats.push(chat);
+                }
+            }
+            if (this.chats.length>0) this.chatsSubject.next(this.chats);
+        });      
     }
 
     public processMessage(evt) {
@@ -119,7 +153,9 @@ export class DataService {
                     let options = new RequestOptions({
                         withCredentials: true
                     });
-                    self.$http.get("https://interactify.io/im/setstatus?status=available&label=", options).subscribe( result => {} );
+                    self.$http.get("https://interactify.io/im/setstatus?status=available&label=", options).subscribe( result => {
+                        //self.refreshInteractions();
+                    });
                 };
                 ws.onmessage = this.processMessage.bind(self);
                 ws.onclose = function() {

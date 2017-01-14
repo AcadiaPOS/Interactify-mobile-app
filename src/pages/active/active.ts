@@ -16,7 +16,6 @@ export class ActivePage {
     constructor(public navCtrl: NavController, public dataService: DataService) {
       var self = this;
       dataService.chatsSubject.subscribe( data => { 
-      	alert(data[0].status);
         self.chats = data;
       });
       dataService.initWebsocket();

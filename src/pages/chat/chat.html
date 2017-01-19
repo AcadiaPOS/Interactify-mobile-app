@@ -5,13 +5,16 @@
 </ion-header>
 
 <ion-content>
-    <ion-list-header>
-      <ion-label>
-            Status: {{chat.status}}
-      </ion-label>
-    </ion-list-header>
-        
-        
+    <ion-grid>
+      <ion-row center>
+          <ion-col width-50>
+              <p align="center">Webhook Status: Connected</p>
+          </ion-col>
+          <ion-col width-50>
+             <p align="center">Channel Status: {{chat.status}}</p>
+          </ion-col>
+      </ion-row>
+    </ion-grid>
     <div *ngFor="let message of chat.messagesSubj | async" style="overflow: hidden;">
         <div *ngIf="chat.agentEmail == message.sender_id" class="bubble left">
         	{{message.text}}

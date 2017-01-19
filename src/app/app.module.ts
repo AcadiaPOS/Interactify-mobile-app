@@ -6,6 +6,26 @@ import { ActivePage } from '../pages/active/active';
 import { TabsPage } from '../pages/tabs/tabs';
 import { ChatPage } from '../pages/chat/chat';
 import { DataService } from '../app/services/data';
+import { CloudSettings, CloudModule } from '@ionic/cloud-angular';
+
+
+const cloudSettings: CloudSettings = {
+  'core': {
+    'app_id': 'interactify',
+  },
+  'push': {
+    'sender_id': '498756908110',
+    'pluginConfig': {
+      'ios': {
+        'badge': true,
+        'sound': true
+      },
+      'android': {
+        'iconColor': '#343434'
+      }
+    }
+  }
+};
 
 @NgModule({
   declarations: [
@@ -16,7 +36,8 @@ import { DataService } from '../app/services/data';
     ChatPage
   ],
   imports: [
-    IonicModule.forRoot(MyApp)
+    IonicModule.forRoot(MyApp),
+    CloudModule.forRoot(cloudSettings)
   ],
   bootstrap: [IonicApp],
   entryComponents: [

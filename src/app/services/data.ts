@@ -4,12 +4,15 @@ import { ChannelEvent } from '../../app/models/channelevent';
 import { CallEvent } from '../../app/models/callevent';
 import { Chat } from '../../app/models/chat';
 import { Message } from '../../app/models/message';
+import { Platform } from 'ionic-angular';
 import { Observable,Subject } from 'rxjs/Rx';
-import { AlertController } from 'ionic-angular';
+import { ReconnectingWebSocket } from '../../app/services/ReconnectingWebSocket';
+import {
+  Push,
+  PushToken
+} from '@ionic/cloud-angular';
 
 @Injectable()
-
-
 export class DataService {
 
     //let state: String = 'NOT_CONNECTED'
@@ -17,17 +20,10 @@ export class DataService {
     public chats: Array<Chat> = new Array<Chat>();
     public chatsSubject: Subject<Array<Chat>> = new Subject<Array<Chat>>();
 
-    constructor(private $http: Http, public alertCtrl: AlertController) {
+    constructor(private $http: Http, public push: Push, public platform: Platform, public reconnectingWebSocket: ReconnectingWebSocket) {
 
     }
-    public loginSuccessAlert() {
-        let alert = this.alertCtrl.create({
-          title: 'Websocket Opened',
-          subTitle: 'You have successfully logged-in',
-          buttons: ['OK']
-        });
-        alert.present();
-    }
+
     public login() {
         let headers = new Headers();
         headers.append('Content-Type', 'application/x-www-form-urlencoded');
@@ -157,19 +153,28 @@ export class DataService {
         this.login().subscribe(response => {
             if ("WebSocket" in window)
             {
-                var ws = new WebSocket("wss://interactify.io/websocket");
-                ws.onopen = function() {
-                    self.loginSuccessAlert();
+                self.reconnectingWebSocket.connect("wss://interactify.io/websocket",true);
+                self.reconnectingWebSocket.onopen = function() {
                     let options = new RequestOptions({
                         withCredentials: true
                     });
                     self.$http.get("https://interactify.io/im/setstatus?status=available&label=", options).subscribe( result => {
-                        //self.refreshInteractions();
+                        self.push.register().then((t: PushToken) => {
+                            var platforms = self.platform.platforms().join(',');
+                            return self.$http.get("https://interactify.io/agent/savetoken?token="+t.token+"&device_type="+platforms).map( result => {
+                                    return t
+                                }
+                            ).toPromise();
+                        }).then((t: PushToken) => {
+                            //console.log('Token saved:', t.token);
+                        }, reason => {
+                            alert('Failed to save the token, reason: '+reason);
+                        });
                     });
                 };
-                ws.onmessage = this.processMessage.bind(self);
-                ws.onclose = function() {
-                    alert('Websocket was closed.');
+                self.reconnectingWebSocket.onmessage = this.processMessage.bind(self);
+                self.reconnectingWebSocket.onclose = function() {
+                    //alert('Websocket was closed.');
                 };
             } else {
                 alert('Websocket not supported in this browser!');

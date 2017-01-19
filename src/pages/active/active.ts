@@ -6,8 +6,7 @@ import { ChatPage } from '../../pages/chat/chat';
 
 @Component({
   selector: 'page-active',
-  templateUrl: 'active.html',
-  providers: [ DataService ]
+  templateUrl: 'active.html'
 })
 export class ActivePage {
 

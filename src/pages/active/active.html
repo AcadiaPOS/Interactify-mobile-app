@@ -1,15 +1,17 @@
 <ion-header>
-  <ion-navbar>
-    <ion-title>Home</ion-title>
+  <ion-navbar color="primary">
+    <ion-title>Chat List</ion-title>
   </ion-navbar>
 </ion-header>
 
 <ion-content padding>
-  <h2>Chats list</h2>
-  <div *ngFor="let chat of chats" (click)="openChat(chat)">
-    <p>
-      Chat from: {{chat.userFullname}}<br/>
-      Status: {{chat.status}}
-    </p>
-  </div>
+    <ion-list>
+      <ion-item *ngFor="let chat of chats" (click)="openChat(chat)">
+        <ion-avatar item-left>
+          <img src="https://www.gravatar.com/avatar/5c7ccc19f5549126ec0a5fa3088db040.jpg?s=150">
+        </ion-avatar>
+        <h2>{{chat.userFullname}}</h2>
+        <p>Status: {{chat.status}}</p>
+      </ion-item>
+    </ion-list>
 </ion-content>

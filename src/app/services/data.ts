@@ -5,8 +5,11 @@ import { CallEvent } from '../../app/models/callevent';
 import { Chat } from '../../app/models/chat';
 import { Message } from '../../app/models/message';
 import { Observable,Subject } from 'rxjs/Rx';
+import { AlertController } from 'ionic-angular';
 
 @Injectable()
+
+
 export class DataService {
 
     //let state: String = 'NOT_CONNECTED'
@@ -14,10 +17,17 @@ export class DataService {
     public chats: Array<Chat> = new Array<Chat>();
     public chatsSubject: Subject<Array<Chat>> = new Subject<Array<Chat>>();
 
-    constructor(private $http: Http) {
+    constructor(private $http: Http, public alertCtrl: AlertController) {
 
     }
-
+    public loginSuccessAlert() {
+        let alert = this.alertCtrl.create({
+          title: 'Websocket Opened',
+          subTitle: 'You have successfully logged-in',
+          buttons: ['OK']
+        });
+        alert.present();
+    }
     public login() {
         let headers = new Headers();
         headers.append('Content-Type', 'application/x-www-form-urlencoded');
@@ -149,7 +159,7 @@ export class DataService {
             {
                 var ws = new WebSocket("wss://interactify.io/websocket");
                 ws.onopen = function() {
-                    alert('Websocket opened');
+                    self.loginSuccessAlert();
                     let options = new RequestOptions({
                         withCredentials: true
                     });

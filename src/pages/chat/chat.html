@@ -1,17 +1,17 @@
 <ion-header>
-  <ion-navbar>
-    <ion-title>Chat</ion-title>
+  <ion-navbar color="primary">
+    <ion-title>{{chat.userFullname}}</ion-title>
   </ion-navbar>
 </ion-header>
 
 <ion-content>
-    <p>
-        Chat with {{chat.userFullname}}, status: {{chat.status}}
-    </p>
-    <div>
-        <input type="text" name="message" id="message" [(ngModel)]="currentMessage"/>
-        <button (click)="sendMessage()">Send</button>
-    </div>    
+    <ion-list-header>
+      <ion-label>
+            Status: {{chat.status}}
+      </ion-label>
+    </ion-list-header>
+        
+        
     <div *ngFor="let message of chat.messagesSubj | async" style="overflow: hidden;">
         <div *ngIf="chat.agentEmail == message.sender_id" class="bubble left">
         	{{message.text}}
@@ -20,5 +20,18 @@
             {{message.text}}
         </div>        
     </div>
+    <ion-footer>
+      <ion-toolbar>
+        <ion-list>
+          <ion-item>
+            <ion-input type="text" name="message" id="message" placeholder="Enter your message" [(ngModel)]="currentMessage"></ion-input>
+            <button (click)="sendMessage()" item-right ion-button large>
+              <ion-icon name="send"></ion-icon>
+              Send
+            </button>
+          </ion-item>
+        </ion-list>
+      </ion-toolbar>
+    </ion-footer>
 
 </ion-content>

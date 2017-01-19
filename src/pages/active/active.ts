@@ -11,6 +11,7 @@ import { ChatPage } from '../../pages/chat/chat';
 export class ActivePage {
 
     @Input() chats: Array<Chat> = new Array<Chat>();
+    connectionStatus: String
 
     constructor(public navCtrl: NavController, public dataService: DataService) {
       var self = this;
@@ -18,6 +19,10 @@ export class ActivePage {
         self.chats = data;
       });
       dataService.initWebsocket();
+      let socket = dataService.reconnectingWebSocket;
+      socket.readyStateSubject.subscribe( value => {
+        self.connectionStatus = socket.statusFormatted(value);
+      });      
     }
 
     public openChat(chat: Chat) {

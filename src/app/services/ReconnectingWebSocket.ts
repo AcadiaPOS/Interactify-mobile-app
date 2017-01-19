@@ -1,4 +1,5 @@
 import { Injectable, Inject } from '@angular/core';
+import { Observable,Subject } from 'rxjs/Rx';
 
 @Injectable()
 export class ReconnectingWebSocket {
@@ -12,6 +13,7 @@ export class ReconnectingWebSocket {
 
     //Should only be used to read WebSocket readyState
     public readyState:number;
+    public readyStateSubject:Subject<number> = new Subject<number>();
 
     //Whether WebSocket was forced to close by this client
     private forcedClose:boolean = false;
@@ -39,6 +41,15 @@ export class ReconnectingWebSocket {
 
     constructor() {
         this.readyState = WebSocket.CONNECTING;
+        this.readyStateSubject.next(this.readyState);
+    }
+
+    public statusFormatted(status: number) {
+        let mapping = {};
+        mapping[WebSocket.CLOSED] = 'Offline';
+        mapping[WebSocket.CONNECTING] = 'Connecting..';
+        mapping[WebSocket.OPEN] = 'Online';
+        return mapping[status];
     }
 
     public connect(url:string, reconnectAttempt:boolean, protocols:string[] = []) {
@@ -61,6 +72,7 @@ export class ReconnectingWebSocket {
             clearTimeout(timeout);
             this.log('ReconnectingWebSocket', 'onopen', this.url);
             this.readyState = WebSocket.OPEN;
+            this.readyStateSubject.next(this.readyState);
             reconnectAttempt = false;
             this.onopen(event);
         };
@@ -70,9 +82,11 @@ export class ReconnectingWebSocket {
             this.ws = null;
             if (this.forcedClose) {
                 this.readyState = WebSocket.CLOSED;
+                this.readyStateSubject.next(this.readyState);
                 this.onclose(event);
             } else {
                 this.readyState = WebSocket.CONNECTING;
+                this.readyStateSubject.next(this.readyState);
                 this.onconnecting();
                 if (!reconnectAttempt && !this.timedOut) {
                     this.log('ReconnectingWebSocket', 'onclose', this.url);

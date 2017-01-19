@@ -7,17 +7,23 @@ import { LoadingController } from 'ionic-angular';
 
 @Component({
   selector: 'page-chat',
-  templateUrl: 'chat.html',
-  providers: [ DataService ]
+  templateUrl: 'chat.html'
 })
+
 export class ChatPage {
 
     chat: Chat
     currentMessage: String
+    connectionStatus: String
 
     constructor(public navCtrl: NavController, public navParams: NavParams, public dataService: DataService, public loadingCtrl: LoadingController) {
       let self = this;
       self.chat = navParams.get('chat');
+      let socket = dataService.reconnectingWebSocket;
+      self.connectionStatus = socket.statusFormatted(socket.readyState);
+      socket.readyStateSubject.subscribe( value => {
+        self.connectionStatus = socket.statusFormatted(value);
+      });      
     }
 
     public sendingPopup() {

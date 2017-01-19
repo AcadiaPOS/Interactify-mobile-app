@@ -153,6 +153,7 @@ export class DataService {
         this.login().subscribe(response => {
             if ("WebSocket" in window)
             {
+                self.reconnectingWebSocket.close();
                 self.reconnectingWebSocket.connect("wss://interactify.io/websocket",true);
                 self.reconnectingWebSocket.onopen = function() {
                     let options = new RequestOptions({

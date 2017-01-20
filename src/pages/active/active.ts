@@ -3,6 +3,7 @@ import { NavController } from 'ionic-angular';
 import { DataService } from '../../app/services/data';
 import { Chat } from '../../app/models/chat';
 import { ChatPage } from '../../pages/chat/chat';
+import { LoginPage } from '../../pages/login/login';
 
 @Component({
   selector: 'page-active',
@@ -18,11 +19,16 @@ export class ActivePage {
       dataService.chatsSubject.subscribe( data => { 
         self.chats = data;
       });
-      dataService.initWebsocket();
       let socket = dataService.reconnectingWebSocket;
       socket.readyStateSubject.subscribe( value => {
         self.connectionStatus = socket.statusFormatted(value);
-      });      
+      });       
+      dataService.login().subscribe( result => {
+        dataService.initWebsocket();
+
+      }, err => {
+        self.navCtrl.push(LoginPage);
+      });    
     }
 
     public openChat(chat: Chat) {

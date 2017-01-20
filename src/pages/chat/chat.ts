@@ -33,6 +33,7 @@ export class ChatPage {
       });
       loader.present();
     }
+    
     public sendMessage() {
         let message = new Message();
         let chat = this.chat;
@@ -43,6 +44,7 @@ export class ChatPage {
         message.text = this.currentMessage;
         message.ts = (new Date()).getUTCSeconds().toString();
         this.dataService.sendChatMessage(message).subscribe( result => {
+          this.currentMessage = "";
     	    chat.messages.push(message);
     	    chat.messagesSubj.next(chat.messages);
         });

@@ -1,0 +1,26 @@
+<ion-header>
+  <ion-navbar color="primary" hideBackButton="true">
+    <ion-title>Login</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <ion-list-header>
+      <ion-label>
+              {{loginError}}
+      </ion-label>
+    </ion-list-header>  
+    <ion-item>
+      <ion-label floating>Username</ion-label>
+      <ion-input [(ngModel)]="username" type="text" value=""></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label floating>Password</ion-label>
+      <ion-input [(ngModel)]="password"  type="password" value=""></ion-input>
+    </ion-item>
+  </ion-list>
+  <div padding>
+    <button item-right ion-button large (click)="login()">Sign In</button>
+  </div>
+</ion-content>

@@ -5,36 +5,36 @@
 </ion-header>
 
 <ion-content>
-    <ion-grid>
-      <ion-row center>
-          <ion-col width-50>
-              <p align="center">Connection Status: {{connectionStatus}}</p>
-          </ion-col>
-          <ion-col width-50>
-             <p align="center">Channel Status: {{chat.status}}</p>
-          </ion-col>
-      </ion-row>
-    </ion-grid>
-    <div *ngFor="let message of chat.messagesSubj | async" style="overflow: hidden;">
-        <div *ngIf="chat.agentEmail == message.sender_id" class="bubble left">
-        	{{message.text}}
-        </div>
-        <div *ngIf="chat.agentEmail != message.sender_id" class="bubble right">
-            {{message.text}}
-        </div>        
-    </div>
+  <ion-grid>
+    <ion-row center>
+      <ion-col width-50>
+        <p align="center">Connection Status: {{connectionStatus}}</p>
+      </ion-col>
+      <ion-col width-50>
+        <p align="center">Channel Status: {{chat.status}}</p>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+  <div *ngFor="let message of chat.messagesSubj | async" style="overflow: hidden;">
+      <div *ngIf="chat.agentEmail == message.sender_id" class="bubble left">
+      	{{message.text}}
+      </div>
+      <div *ngIf="chat.agentEmail != message.sender_id" class="bubble right">
+          {{message.text}}
+      </div>        
+  </div>
 </ion-content>
 
-    <ion-footer>
-      <ion-toolbar>
-        <ion-list>
-          <ion-item>
-            <ion-input type="text" name="message" id="message" placeholder="Enter your message" [(ngModel)]="currentMessage"></ion-input>
-            <button (click)="sendMessage()" item-right ion-button large>
-              <ion-icon name="send"></ion-icon>
-              Send
-            </button>
-          </ion-item>
-        </ion-list>
-      </ion-toolbar>
-    </ion-footer>
+<ion-footer>
+  <ion-toolbar>
+    <ion-list>
+      <ion-item>
+        <ion-input type="text" name="message" id="message" placeholder="Enter your message" [(ngModel)]="currentMessage"></ion-input>
+        <button (click)="sendMessage()" item-right ion-button large>
+          <ion-icon name="send"></ion-icon>
+          Send
+        </button>
+      </ion-item>
+    </ion-list>
+  </ion-toolbar>
+</ion-footer>

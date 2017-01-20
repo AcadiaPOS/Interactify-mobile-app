@@ -14,8 +14,6 @@ import {
 
 @Injectable()
 export class DataService {
-
-    //let state: String = 'NOT_CONNECTED'
     
     public chats: Array<Chat> = new Array<Chat>();
     public chatsSubject: Subject<Array<Chat>> = new Subject<Array<Chat>>();
@@ -31,7 +29,9 @@ export class DataService {
             headers: headers,
             withCredentials: true
         });
-        return this.$http.post("https://interactify.io/login?stop_success_redirect=1","username=evg&password=test1234",options);
+        let username = window.localStorage.getItem("username");
+        let password = window.localStorage.getItem("password");
+        return this.$http.post("https://interactify.io/login?stop_success_redirect=1","username="+username+"&password="+password,options);
     }
 
     public findChatByChannelId(channelId) {
@@ -150,40 +150,37 @@ export class DataService {
 
     public initWebsocket() {
         var self = this;
-        this.login().subscribe(response => {
-            if ("WebSocket" in window)
-            {
-                self.reconnectingWebSocket.close();
-                self.reconnectingWebSocket.connect("wss://interactify.io/websocket",true);
-                self.reconnectingWebSocket.onopen = function() {
-                    let options = new RequestOptions({
-                        withCredentials: true
+        
+        if ("WebSocket" in window)
+        {
+            self.reconnectingWebSocket.close();
+            self.reconnectingWebSocket.connect("wss://interactify.io/websocket",true);
+            self.reconnectingWebSocket.onopen = function() {
+                let options = new RequestOptions({
+                    withCredentials: true
+                });
+                self.$http.get("https://interactify.io/im/setstatus?status=available&label=", options).subscribe( result => {
+                    self.push.register().then((t: PushToken) => {
+                        var platforms = self.platform.platforms().join(',');
+                        return self.$http.get("https://interactify.io/agent/savetoken?token="+t.token+"&device_type="+platforms).map( result => {
+                                return t
+                            }
+                        ).toPromise();
+                    }).then((t: PushToken) => {
+                        //console.log('Token saved:', t.token);
+                    }, reason => {
+                        alert('Failed to save the token, reason: '+reason);
                     });
-                    self.$http.get("https://interactify.io/im/setstatus?status=available&label=", options).subscribe( result => {
-                        self.push.register().then((t: PushToken) => {
-                            var platforms = self.platform.platforms().join(',');
-                            return self.$http.get("https://interactify.io/agent/savetoken?token="+t.token+"&device_type="+platforms).map( result => {
-                                    return t
-                                }
-                            ).toPromise();
-                        }).then((t: PushToken) => {
-                            //console.log('Token saved:', t.token);
-                        }, reason => {
-                            alert('Failed to save the token, reason: '+reason);
-                        });
-                    });
-                };
-                self.reconnectingWebSocket.onmessage = this.processMessage.bind(self);
-                self.reconnectingWebSocket.onclose = function() {
-                    //alert('Websocket was closed.');
-                };
-            } else {
-                alert('Websocket not supported in this browser!');
-            }
-        }, err => {
-            alert(err);
-            alert('Login failed!');
-        });
+                });
+            };
+            self.reconnectingWebSocket.onmessage = this.processMessage.bind(self);
+            self.reconnectingWebSocket.onclose = function() {
+                //alert('Websocket was closed.');
+            };
+        } else {
+            alert('Websocket not supported in this browser!');
+        }
+
     }
 
     public getInteractions(): String {

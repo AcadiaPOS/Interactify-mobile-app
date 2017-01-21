@@ -22,18 +22,6 @@ export class DataService {
 
     }
 
-    public login() {
-        let headers = new Headers();
-        headers.append('Content-Type', 'application/x-www-form-urlencoded');
-        let options = new RequestOptions({
-            headers: headers,
-            withCredentials: true
-        });
-        let username = window.localStorage.getItem("username");
-        let password = window.localStorage.getItem("password");
-        return this.$http.post("https://interactify.io/login?stop_success_redirect=1","username="+username+"&password="+password,options);
-    }
-
     public findChatByChannelId(channelId) {
         for (let chat of this.chats) {
             if(chat.channelId == channelId) return chat;
@@ -175,7 +163,6 @@ export class DataService {
             };
             self.reconnectingWebSocket.onmessage = this.processMessage.bind(self);
             self.reconnectingWebSocket.onclose = function() {
-                //alert('Websocket was closed.');
             };
         } else {
             alert('Websocket not supported in this browser!');

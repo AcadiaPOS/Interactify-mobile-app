@@ -1,5 +1,6 @@
 import { Injectable, Inject } from '@angular/core';
 import { Observable,Subject } from 'rxjs/Rx';
+import { Http,Headers,RequestOptions } from "@angular/http";
 
 @Injectable()
 export class ReconnectingWebSocket {
@@ -39,7 +40,19 @@ export class ReconnectingWebSocket {
     public onmessage:(ev:MessageEvent) => void = function (event:MessageEvent) {};
     public onerror:(ev:ErrorEvent) => void = function (event:ErrorEvent) {};
 
-    constructor() {
+    public login() {
+        let headers = new Headers();
+        headers.append('Content-Type', 'application/x-www-form-urlencoded');
+        let options = new RequestOptions({
+            headers: headers,
+            withCredentials: true
+        });
+        let username = window.localStorage.getItem("username");
+        let password = window.localStorage.getItem("password");
+        return this.$http.post("https://interactify.io/login?stop_success_redirect=1","username="+username+"&password="+password,options);
+    }    
+
+    constructor(private $http: Http) {
         this.readyState = WebSocket.CONNECTING;
         this.readyStateSubject.next(this.readyState);
     }
@@ -53,58 +66,66 @@ export class ReconnectingWebSocket {
     }
 
     public connect(url:string, reconnectAttempt:boolean, protocols:string[] = []) {
-        this.url = url;
-        this.protocols = protocols;
-        this.ws = new WebSocket(this.url, this.protocols);
-
-        this.onconnecting();
-        this.log('ReconnectingWebSocket', 'attempt-connect', this.url);
-
-        var localWs = this.ws;
-        var timeout = setTimeout(() => {
-            this.log('ReconnectingWebSocket', 'connection-timeout', this.url);
-            this.timedOut = true;
-            localWs.close();
-            this.timedOut = false;
-        }, this.timeoutInterval);
-
-        this.ws.onopen = (event:Event) => {
-            clearTimeout(timeout);
-            this.log('ReconnectingWebSocket', 'onopen', this.url);
-            this.readyState = WebSocket.OPEN;
+        let self = this;
+        this.readyState = WebSocket.CLOSED;
+        this.readyStateSubject.next(this.readyState);
+        this.login().subscribe( () => {
+            this.url = url;
+            this.protocols = protocols;
+            this.ws = new WebSocket(this.url, this.protocols);
+            this.readyState = WebSocket.CONNECTING;
             this.readyStateSubject.next(this.readyState);
-            reconnectAttempt = false;
-            this.onopen(event);
-        };
+            this.onconnecting();
+            this.log('ReconnectingWebSocket', 'attempt-connect', this.url);
 
-        this.ws.onclose = (event:CloseEvent) => {
-            clearTimeout(timeout);
-            this.ws = null;
-            if (this.forcedClose) {
-                this.readyState = WebSocket.CLOSED;
+            var localWs = this.ws;
+            var timeout = setTimeout(() => {
+                this.log('ReconnectingWebSocket', 'connection-timeout', this.url);
+                this.timedOut = true;
+                localWs.close();
+                this.timedOut = false;
+            }, this.timeoutInterval);
+
+            this.ws.onopen = (event:Event) => {
+                clearTimeout(timeout);
+                this.log('ReconnectingWebSocket', 'onopen', this.url);
+                this.readyState = WebSocket.OPEN;
                 this.readyStateSubject.next(this.readyState);
-                this.onclose(event);
-            } else {
-                this.readyState = WebSocket.CONNECTING;
-                this.readyStateSubject.next(this.readyState);
-                this.onconnecting();
-                if (!reconnectAttempt && !this.timedOut) {
-                    this.log('ReconnectingWebSocket', 'onclose', this.url);
+                reconnectAttempt = false;
+                this.onopen(event);
+            };
+
+            this.ws.onclose = (event:CloseEvent) => {
+                clearTimeout(timeout);
+                this.ws = null;
+                if (this.forcedClose) {
+                    this.readyState = WebSocket.CLOSED;
+                    this.readyStateSubject.next(this.readyState);
                     this.onclose(event);
+                } else {
+                    if (!reconnectAttempt && !this.timedOut) {
+                        this.log('ReconnectingWebSocket', 'onclose', this.url);
+                        this.onclose(event);
+                    }
+                    setTimeout(() => {
+                        this.connect(url, reconnectAttempt, protocols);
+                    }, this.reconnectInterval);
                 }
-                setTimeout(() => {
-                    this.connect(url, reconnectAttempt, protocols);
-                }, this.reconnectInterval);
-            }
-        };
-        this.ws.onmessage = (event) => {
-            this.log('ReconnectingWebSocket', 'onmessage', this.url, event.data);
-            this.onmessage(event);
-        };
-        this.ws.onerror = (event) => {
-            this.log('ReconnectingWebSocket', 'onerror', this.url, event);
-            this.onerror(event);
-        };
+            };
+            this.ws.onmessage = (event) => {
+                this.log('ReconnectingWebSocket', 'onmessage', this.url, event.data);
+                this.onmessage(event);
+            };
+            this.ws.onerror = (event) => {
+                this.log('ReconnectingWebSocket', 'onerror', this.url, event);
+                this.onerror(event);
+            };
+        }, err => {
+            //alert("Failed to login in websocket! Could be a network issue. Try to close the app and open it again.");
+            setTimeout(() => {
+                self.connect(url, reconnectAttempt, protocols);
+            }, self.reconnectInterval);
+        });
     }
 
     public send(data:any) {

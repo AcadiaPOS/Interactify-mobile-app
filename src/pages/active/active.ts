@@ -23,9 +23,8 @@ export class ActivePage {
       socket.readyStateSubject.subscribe( value => {
         self.connectionStatus = socket.statusFormatted(value);
       });       
-      dataService.login().subscribe( result => {
+      dataService.reconnectingWebSocket.login().subscribe( result => {
         dataService.initWebsocket();
-
       }, err => {
         self.navCtrl.push(LoginPage);
       });    

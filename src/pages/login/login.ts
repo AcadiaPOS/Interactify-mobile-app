@@ -20,7 +20,7 @@ export class LoginPage {
   	var self = this;
     window.localStorage.setItem("username", this.username);
     window.localStorage.setItem("password", this.password);
-    self.dataService.login().subscribe( result => {
+    self.dataService.reconnectingWebSocket.login().subscribe( result => {
       self.dataService.initWebsocket();
       self.navCtrl.pop();
     }, err => {

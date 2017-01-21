@@ -30,7 +30,7 @@ export class MyApp {
       });
 
       document.addEventListener("resume", () => {
-        dataService.initWebsocket();
+          dataService.initWebsocket();
       })
 
 

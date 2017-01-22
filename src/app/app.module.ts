@@ -6,6 +6,7 @@ import { ActivePage } from '../pages/active/active';
 import { TabsPage } from '../pages/tabs/tabs';
 import { ChatPage } from '../pages/chat/chat';
 import { LoginPage } from '../pages/login/login';
+import { HistoryinfoPage } from '../pages/historyinfo/historyinfo';
 import { DataService } from '../app/services/data';
 import { CloudSettings, CloudModule } from '@ionic/cloud-angular';
 
@@ -35,7 +36,8 @@ const cloudSettings: CloudSettings = {
     ActivePage,
     TabsPage,
     ChatPage,
-    LoginPage
+    LoginPage,
+    HistoryinfoPage
   ],
   imports: [
     IonicModule.forRoot(MyApp),
@@ -48,7 +50,8 @@ const cloudSettings: CloudSettings = {
     ActivePage,
     TabsPage,
     ChatPage,
-    LoginPage
+    LoginPage,
+    HistoryinfoPage
   ],
   providers: [{provide: ErrorHandler, useClass: IonicErrorHandler}, DataService]
 })

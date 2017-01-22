@@ -4,6 +4,7 @@ import { ChannelEvent } from '../../app/models/channelevent';
 import { CallEvent } from '../../app/models/callevent';
 import { Chat } from '../../app/models/chat';
 import { Message } from '../../app/models/message';
+import { HistoryEntry } from '../../app/models/historyentry';
 import { Platform } from 'ionic-angular';
 import { Observable,Subject } from 'rxjs/Rx';
 import { ReconnectingWebSocket } from '../../app/services/ReconnectingWebSocket';
@@ -17,6 +18,8 @@ export class DataService {
     
     public chats: Array<Chat> = new Array<Chat>();
     public chatsSubject: Subject<Array<Chat>> = new Subject<Array<Chat>>();
+
+    public historySubject: Subject<Array<HistoryEntry>> = new Subject<Array<HistoryEntry>>();
 
     constructor(private $http: Http, public push: Push, public platform: Platform, public reconnectingWebSocket: ReconnectingWebSocket) {
 
@@ -105,7 +108,7 @@ export class DataService {
                 }
             }
             if (this.chats.length>0) this.chatsSubject.next(this.chats);
-        });      
+        });
     }
 
     public processMessage(evt) {
@@ -155,8 +158,10 @@ export class DataService {
                             }
                         ).toPromise();
                     }).then((t: PushToken) => {
+                        self.refreshInteractions();
                         //console.log('Token saved:', t.token);
                     }, reason => {
+                        self.refreshInteractions();
                         alert('Failed to save the token, reason: '+reason);
                     });
                 });
@@ -170,8 +175,24 @@ export class DataService {
 
     }
 
-    public getInteractions(): String {
-        return "";
+    public fetchHistory() {
+        let options = new RequestOptions({
+            withCredentials: true
+        });        
+        let history = new Array<HistoryEntry>();
+        this.$http.get("https://interactify.io/im/json/history", options).subscribe(result => {
+            let channels = result.json();
+            for(let jsonChat of channels as Array<any>) {
+                let entry = new HistoryEntry();
+                if (jsonChat.interactionType == "chat") {
+                    entry.fromJson(jsonChat);
+                    history.push(entry);
+                }
+            }
+            if (history.length>0) {
+              this.historySubject.next(history);              
+            } 
+        });
     }
 
 }

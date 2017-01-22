@@ -7,11 +7,23 @@
 </ion-header>
 
 <ion-content>
+  <ion-list-header>
+    <ion-row center>  
+      <ion-col width-50>
+        Connection Status: {{connectionStatus}}
+      </ion-col>
+      <ion-col width-50>
+        <button (click)="fetchHistory()"  item-right ion-button>Fetch/Refresh history</button>
+      </ion-col>
+    </ion-row>   
+  </ion-list-header>
   <ion-list>
-    <ion-list-header>Follow us on Twitter</ion-list-header>
-    <ion-item>
-      <ion-icon name="ionic" item-left></ion-icon>
-      @ionicframework
+    <ion-item *ngFor="let chat of historyChats" (click)="openChat(chat)">
+      <ion-avatar item-left>
+        <img src="https://www.gravatar.com/avatar/{{chat.callerIdHash}}.jpg?s=150">
+      </ion-avatar>
+      <h2>{{chat.callerId}}</h2>
+      <p>Timestamp: {{chat.ts}}</p>
     </ion-item>
   </ion-list>
 </ion-content>

@@ -1,0 +1,24 @@
+<ion-header>
+  <ion-navbar color="primary">
+    <ion-title>{{chat.callerId}}</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content>
+  <ion-grid>
+    <ion-row center>
+      <ion-col width-50>
+        <p align="center">Connection Status: {{connectionStatus}}</p>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+  <div *ngFor="let message of chat.messages" style="overflow: hidden;">
+      <div *ngIf="chat.callerId == message.sender_id" class="bubble left">
+      	{{message.text}}
+      </div>
+      <div *ngIf="chat.callerId != message.sender_id" class="bubble right">
+          {{message.text}}
+      </div>        
+  </div>
+</ion-content>
+

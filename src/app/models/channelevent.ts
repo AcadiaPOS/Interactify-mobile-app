@@ -8,6 +8,7 @@ export class ChannelEvent {
     callerDescr: String
     agentId: String
     interactionType: String
+    callerIdHash: String
 
     public fromJson(json) {
     	this.status = json['status'];
@@ -17,5 +18,6 @@ export class ChannelEvent {
     	this.callerDescr = json['callerDescr'];
     	this.agentId = json['agentId'];
     	this.interactionType = json['interactionType'];
+        this.callerIdHash = json['callerIdHash'];
     }
 }

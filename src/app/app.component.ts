@@ -26,12 +26,16 @@ export class MyApp {
       Splashscreen.hide();
 
       push.rx.notification().subscribe((msg) => {
-        alert('Notification:'+msg.title);
+        //alert('Notification:'+msg.title);
+      });
+
+      document.addEventListener("pause", () => {
+          dataService.reconnectingWebSocket.close();
       });
 
       document.addEventListener("resume", () => {
           dataService.initWebsocket();
-      })
+      });
 
 
     });

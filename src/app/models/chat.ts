@@ -1,6 +1,7 @@
 import { Input } from '@angular/core';
 import { Message } from '../../app/models/message';
 import { ChannelEvent } from '../../app/models/channelevent';
+import { HistoryEntry } from '../../app/models/historyentry';
 import { Observable,Subject } from 'rxjs/Rx';
 
 export class Chat {
@@ -9,6 +10,7 @@ export class Chat {
     agentEmail: String = ""
     userId: String = ""
     userFullname: String = ""
+    callerIdHash: String = ""
     @Input() status: String = ""
 
     public messages: Array<Message> = new Array<Message>()
@@ -25,6 +27,6 @@ export class Chat {
         this.userId = channelEvent.callerId;
         this.userFullname = channelEvent.callerDescr;
         this.status = channelEvent.status;
-    }
-    
+        this.callerIdHash = channelEvent.callerIdHash;
+    }    
 }

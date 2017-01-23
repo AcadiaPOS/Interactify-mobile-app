@@ -9,11 +9,13 @@
 <ion-content>
   <ion-list-header>
     <ion-row center>  
+      <label>
+        Status: {{connectionStatus}}
+      </label>
       <ion-col width-50>
-        Connection Status: {{connectionStatus}}
-      </ion-col>
-      <ion-col width-50>
-        <button (click)="fetchHistory()"  item-right ion-button>Fetch/Refresh history</button>
+        <button (click)="fetchHistory()"  item-right ion-button>
+          Refresh history
+        </button>
       </ion-col>
     </ion-row>   
   </ion-list-header>

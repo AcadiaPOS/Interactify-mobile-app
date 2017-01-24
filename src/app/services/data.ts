@@ -18,8 +18,8 @@ export class DataService {
     
     public chats: Array<Chat> = new Array<Chat>();
     public chatsSubject: Subject<Array<Chat>> = new Subject<Array<Chat>>();
-
     public historySubject: Subject<Array<HistoryEntry>> = new Subject<Array<HistoryEntry>>();
+    public scrollUpdateSubject: Subject<any> = new Subject();
 
     constructor(private $http: Http, public push: Push, public platform: Platform, public reconnectingWebSocket: ReconnectingWebSocket) {
 
@@ -130,6 +130,7 @@ export class DataService {
                     let chatMessage: Message = new Message();
                     chatMessage.fromJson(data);
                     this.handleChatMessage(chatMessage);
+                    this.scrollUpdateSubject.next(null);
                 break;
             case "queue_event":
                 break;

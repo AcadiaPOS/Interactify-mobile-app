@@ -4,7 +4,7 @@
   </ion-navbar>
 </ion-header>
 
-<ion-content>
+<ion-content #mainChat>
   <ion-grid>
     <ion-row center>
       <ion-col width-50>
@@ -29,7 +29,8 @@
   <ion-toolbar>
     <ion-list>
       <ion-item>
-        <ion-input type="text" name="message" id="message" placeholder="Enter your message" [(ngModel)]="currentMessage"></ion-input>
+        <!--<ion-input #messageInput (click)="setFocus()" type="text" autofocus name="message" id="message" placeholder="Enter your msg" [(ngModel)]="currentMessage"></ion-input> -->
+        <input class="text-input" type="text" name="message" id="message" placeholder="Enter your msg" [(ngModel)]="currentMessage"/>
         <button (click)="sendMessage()" item-right ion-button large>
           <ion-icon name="send"></ion-icon>
           Send

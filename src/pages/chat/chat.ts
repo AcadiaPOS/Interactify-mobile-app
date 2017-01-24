@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ViewChild } from '@angular/core';
 import { NavController, NavParams } from 'ionic-angular';
 import { DataService } from '../../app/services/data';
 import { Chat } from '../../app/models/chat';
@@ -15,6 +15,7 @@ export class ChatPage {
     chat: Chat
     currentMessage: String
     connectionStatus: String
+    @ViewChild("mainChat") chatWindow; 
 
     constructor(public navCtrl: NavController, public navParams: NavParams, public dataService: DataService, public loadingCtrl: LoadingController) {
       let self = this;
@@ -24,6 +25,9 @@ export class ChatPage {
       socket.readyStateSubject.subscribe( value => {
         self.connectionStatus = socket.statusFormatted(value);
       });      
+      dataService.scrollUpdateSubject.subscribe( () => {
+          self.chatWindow.scrollTo(0, 99999, 700);
+      });
     }
 
     public sendingPopup() {
@@ -43,10 +47,12 @@ export class ChatPage {
         message.sender_id = this.chat.agentEmail;
         message.text = this.currentMessage;
         message.ts = (new Date()).getUTCSeconds().toString();
+
         this.dataService.sendChatMessage(message).subscribe( result => {
           this.currentMessage = "";
     	    chat.messages.push(message);
     	    chat.messagesSubj.next(chat.messages);
+          this.dataService.scrollUpdateSubject.next(null);
         });
     }
 

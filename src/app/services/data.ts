@@ -107,7 +107,7 @@ export class DataService {
                     this.chats.push(chat);
                 }
             }
-            if (this.chats.length>0) this.chatsSubject.next(this.chats);
+            this.chatsSubject.next(this.chats);
         });
     }
 

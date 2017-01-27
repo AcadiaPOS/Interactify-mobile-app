@@ -1,24 +1,29 @@
 <ion-header>
   <ion-navbar color="primary" hideBackButton="true">
-    <ion-title>Login</ion-title>
+    <ion-title>Sign In</ion-title>
   </ion-navbar>
 </ion-header>
 
 <ion-content>
   <ion-list>
+
     <ion-list-header>
       <ion-label>
         {{loginError}}
       </ion-label>
     </ion-list-header>  
+
     <ion-item>
-      <input [(ngModel)]="username" type="text" value="" class="text-input" placeholder="Enter username" />
+      <input [(ngModel)]="username" type="text" value="" class="text-input" placeholder="Username" />
     </ion-item>
+
     <ion-item>
-      <input [(ngModel)]="password"  type="password" value="" class="text-input" placeholder="Enter password" />
+      <input [(ngModel)]="password"  type="password" value="" class="text-input" placeholder="Password" />
     </ion-item>
+
   </ion-list>
+
   <div padding>
-    <button item-right ion-button large (click)="login()">Sign In</button>
+    <button ion-button color="primary" block (click)="login()">Sign In</button>
   </div>
 </ion-content>

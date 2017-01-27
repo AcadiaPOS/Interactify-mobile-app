@@ -5,6 +5,7 @@ import { Chat } from '../../app/models/chat';
 import { Message } from '../../app/models/message';
 import { LoadingController } from 'ionic-angular';
 import { AlertController } from 'ionic-angular';
+import { Platform, ActionSheetController } from 'ionic-angular';
 
 @Component({
   selector: 'page-chat',
@@ -18,7 +19,7 @@ export class ChatPage {
     connectionStatus: String
     @ViewChild("mainChat") chatWindow; 
 
-    constructor(public navCtrl: NavController, public navParams: NavParams, public dataService: DataService, public loadingCtrl: LoadingController, public alerCtrl: AlertController) {
+    constructor(public navCtrl: NavController, public navParams: NavParams, public dataService: DataService, public loadingCtrl: LoadingController, public alerCtrl: AlertController, public platform: Platform, public actionsheetCtrl: ActionSheetController) {
       let self = this;
       self.chat = navParams.get('chat');
       let socket = dataService.reconnectingWebSocket;
@@ -78,6 +79,50 @@ export class ChatPage {
     });
     confirm.present()
   }
+
+
+  public chooseOutcome() {
+    let actionSheet = this.actionsheetCtrl.create({
+      title: 'Choose an outcome',
+      cssClass: 'action-sheets-basic-page',
+      buttons: [
+        {
+          text: '1st outcome',
+          role: 'destructive',
+          handler: () => {
+            console.log('1st outcome clicked');
+          }
+        },
+        {
+          text: '2nd outcome',
+          handler: () => {
+            console.log('1st outcome clicked');
+          }
+        },
+        {
+          text: '3rd outcome',
+          handler: () => {
+            console.log('3rd outcome clicked');
+          }
+        },
+        {
+          text: '4th outcome',
+          handler: () => {
+            console.log('4th outcome clicked');
+          }
+        },
+        {
+          text: 'Cancel',
+          role: 'cancel', // will always sort to be on the bottom
+          icon: !this.platform.is('ios') ? 'close' : null,
+          handler: () => {
+            console.log('Cancel clicked');
+          }
+        }
+      ]
+    });
+    actionSheet.present();
+    }
 
 
 }

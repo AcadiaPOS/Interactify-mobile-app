@@ -4,6 +4,7 @@ import { DataService } from '../../app/services/data';
 import { Chat } from '../../app/models/chat';
 import { Message } from '../../app/models/message';
 import { LoadingController } from 'ionic-angular';
+import { AlertController } from 'ionic-angular';
 
 @Component({
   selector: 'page-chat',
@@ -17,7 +18,7 @@ export class ChatPage {
     connectionStatus: String
     @ViewChild("mainChat") chatWindow; 
 
-    constructor(public navCtrl: NavController, public navParams: NavParams, public dataService: DataService, public loadingCtrl: LoadingController) {
+    constructor(public navCtrl: NavController, public navParams: NavParams, public dataService: DataService, public loadingCtrl: LoadingController, public alerCtrl: AlertController) {
       let self = this;
       self.chat = navParams.get('chat');
       let socket = dataService.reconnectingWebSocket;
@@ -55,5 +56,28 @@ export class ChatPage {
           this.dataService.scrollUpdateSubject.next(null);
         });
     }
+
+    public doConfirmEndChat() {
+    let confirm = this.alerCtrl.create({
+      title: 'End Chat',
+      message: 'Are you sure you wanna end this chat?',
+      buttons: [
+        {
+          text: 'No',
+          handler: () => {
+            console.log('No clicked');
+          }
+        },
+        {
+          text: 'Yes',
+          handler: () => {
+            console.log('Yes clicked');
+          }
+        }
+      ]
+    });
+    confirm.present()
+  }
+
 
 }

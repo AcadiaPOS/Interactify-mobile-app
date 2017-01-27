@@ -72,6 +72,11 @@ export class ReconnectingWebSocket {
         this.login().subscribe( () => {
             this.url = url;
             this.protocols = protocols;
+            WebSocket['pluginOptions'] = {
+                origin: 'https://',
+                maxConnectTime: 5000,
+                override: true
+            };
             this.ws = new WebSocket(this.url, this.protocols);
             this.readyState = WebSocket.CONNECTING;
             this.readyStateSubject.next(this.readyState);

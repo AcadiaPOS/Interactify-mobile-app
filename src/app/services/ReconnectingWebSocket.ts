@@ -49,7 +49,7 @@ export class ReconnectingWebSocket {
         });
         let username = window.localStorage.getItem("username");
         let password = window.localStorage.getItem("password");
-        return this.$http.post("https://interactify.io/login?stop_success_redirect=1","username="+username+"&password="+password,options);
+        return this.$http.post("https://manage.interactify.io/login?stop_success_redirect=1","username="+username+"&password="+password,options);
     }    
 
     constructor(private $http: Http) {
@@ -126,7 +126,6 @@ export class ReconnectingWebSocket {
                 this.onerror(event);
             };
         }, err => {
-            //alert("Failed to login in websocket! Could be a network issue. Try to close the app and open it again.");
             setTimeout(() => {
                 self.connect(url, reconnectAttempt, protocols);
             }, self.reconnectInterval);

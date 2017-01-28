@@ -101,10 +101,19 @@ export class DataService {
         }
     }
 
+    public playSound(sound: String) {
+        let audio = new Audio();
+        audio.src = "assets/audio/"+sound+".wav";
+        audio.load();
+        audio.play();        
+    }
+
     public handleChatMessage(chatMessage: Message) {
         let chat: Chat = this.findChatByInteractionId(chatMessage.interaction_id);
         chat.messages.push(chatMessage);
         chat.messagesSubj.next(chat.messages);
+        this.playSound('message');
+
     }
 
     public sendChatMessage(chatMessage: Message) {
@@ -170,7 +179,7 @@ export class DataService {
         if ("WebSocket" in window)
         {
             self.reconnectingWebSocket.close();
-            self.reconnectingWebSocket.connect("wss://"+self.hostname+"websocket",true);
+            self.reconnectingWebSocket.connect("wss://"+self.hostname+"/websocket",true);
             self.reconnectingWebSocket.onopen = function() {
                 let options = new RequestOptions({
                     withCredentials: true

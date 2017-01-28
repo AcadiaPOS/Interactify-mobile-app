@@ -14,9 +14,9 @@ import { Platform, ActionSheetController } from 'ionic-angular';
 
 export class ChatPage {
 
-    chat: Chat
-    currentMessage: String
-    connectionStatus: String
+    chat: Chat;
+    currentMessage: String;
+    connectionStatus: String;
     @ViewChild("mainChat") chatWindow; 
 
     constructor(public navCtrl: NavController, public navParams: NavParams, public dataService: DataService, public loadingCtrl: LoadingController, public alerCtrl: AlertController, public platform: Platform, public actionsheetCtrl: ActionSheetController) {

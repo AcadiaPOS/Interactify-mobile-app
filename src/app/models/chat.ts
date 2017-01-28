@@ -5,14 +5,14 @@ import { HistoryEntry } from '../../app/models/historyentry';
 import { Observable,Subject } from 'rxjs/Rx';
 
 export class Chat {
-    channelId: String = ""
-    callId: String = ""
-    agentEmail: String = ""
-    userId: String = ""
-    userFullname: String = ""
-    callerIdHash: String = ""
-    outcomeSubmitted: Boolean = false
-    @Input() status: String = ""
+    channelId: String = "";
+    callId: String = "";
+    agentEmail: String = "";
+    userId: String = "";
+    userFullname: String = "";
+    callerIdHash: String = "";
+    outcomeSubmitted: Boolean = false;
+    status: String = "";
 
     public messages: Array<Message> = new Array<Message>()
     public messagesSubj: Subject<Array<Message>> = new Subject<Array<Message>>()

@@ -20,6 +20,9 @@ export class DataService {
     public chatsSubject: Subject<Array<Chat>> = new Subject<Array<Chat>>();
     public historySubject: Subject<Array<HistoryEntry>> = new Subject<Array<HistoryEntry>>();
     public scrollUpdateSubject: Subject<any> = new Subject();
+    public hostname = "manage.interactify.io";
+    public baseUri = "https://" + this.hostname;
+
 
     constructor(private $http: Http, public push: Push, public platform: Platform, public reconnectingWebSocket: ReconnectingWebSocket) {
 
@@ -43,28 +46,28 @@ export class DataService {
         let options = new RequestOptions({
             withCredentials: true
         });
-        return this.$http.get("https://interactify.io/im/chat/end?interactionId=" + callId,options);            
+        return this.$http.get(this.baseUri+"/im/chat/end?interactionId=" + callId,options);            
     }
 
     public getOutcomes() {
         let options = new RequestOptions({
             withCredentials: true
         });
-        return this.$http.get("https://interactify.io/im/outcomes",options);                    
+        return this.$http.get(this.baseUri+"/im/outcomes",options);                    
     }
 
     public submitOutcome(callId: String, outcomeId: String) {
         let options = new RequestOptions({
             withCredentials: true
         });
-        return this.$http.get("https://interactify.io/im/outcome?outcomeId="+outcomeId+"&callId="+callId+"&notes=",options);    
+        return this.$http.get(this.baseUri+"/im/outcome?outcomeId="+outcomeId+"&callId="+callId+"&notes=",options);    
     }
 
     public acceptPersistentInteraction(callId: String, type: String) {
         let options = new RequestOptions({
             withCredentials: true
         });
-        return this.$http.get("https://interactify.io/im/calls/persistentaccept?callid=" + callId + "&type=" + type,options);       
+        return this.$http.get(this.baseUri+"/im/calls/persistentaccept?callid=" + callId + "&type=" + type,options);       
     }
 
     public handleCallEvent(callEvent: CallEvent) {
@@ -111,7 +114,7 @@ export class DataService {
             headers: headers,
             withCredentials: true
         });
-        return this.$http.post("https://interactify.io/im/chat/post","interaction_id="+chatMessage.interaction_id+"&message="+chatMessage.text,options);
+        return this.$http.post(this.baseUri+"/im/chat/post","interaction_id="+chatMessage.interaction_id+"&message="+chatMessage.text,options);
     }
 
     public refreshInteractions() {
@@ -119,7 +122,7 @@ export class DataService {
             withCredentials: true
         });
         this.chats = new Array<Chat>();
-        this.$http.get("https://interactify.io/im/json/channels", options).subscribe(result => {
+        this.$http.get(this.baseUri+"/im/json/channels", options).subscribe(result => {
             let channels = result.json();
             for(let jsonChat of channels as Array<any>) {
                 let chat = new Chat();
@@ -167,15 +170,15 @@ export class DataService {
         if ("WebSocket" in window)
         {
             self.reconnectingWebSocket.close();
-            self.reconnectingWebSocket.connect("wss://interactify.io/websocket",true);
+            self.reconnectingWebSocket.connect("wss://"+self.hostname+"websocket",true);
             self.reconnectingWebSocket.onopen = function() {
                 let options = new RequestOptions({
                     withCredentials: true
                 });
-                self.$http.get("https://interactify.io/im/setstatus?status=available&label=", options).subscribe( result => {
+                self.$http.get(self.baseUri+"/im/setstatus?status=available&label=", options).subscribe( result => {
                     self.push.register().then((t: PushToken) => {
                         var platforms = self.platform.platforms().join(',');
-                        return self.$http.get("https://interactify.io/agent/savetoken?token="+t.token+"&device_type="+platforms).map( result => {
+                        return self.$http.get(self.baseUri+"/agent/savetoken?token="+t.token+"&device_type="+platforms).map( result => {
                                 return t
                             }
                         ).toPromise();
@@ -202,7 +205,7 @@ export class DataService {
             withCredentials: true
         });        
         let history = new Array<HistoryEntry>();
-        this.$http.get("https://interactify.io/im/json/history", options).subscribe(result => {
+        this.$http.get(this.baseUri+"/im/json/history", options).subscribe(result => {
             let channels = result.json();
             for(let jsonChat of channels as Array<any>) {
                 let entry = new HistoryEntry();

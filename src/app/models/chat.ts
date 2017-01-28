@@ -11,6 +11,7 @@ export class Chat {
     userId: String = ""
     userFullname: String = ""
     callerIdHash: String = ""
+    outcomeSubmitted: Boolean = false
     @Input() status: String = ""
 
     public messages: Array<Message> = new Array<Message>()

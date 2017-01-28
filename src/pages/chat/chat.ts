@@ -59,69 +59,66 @@ export class ChatPage {
     }
 
     public doConfirmEndChat() {
-    let confirm = this.alerCtrl.create({
-      title: 'End Chat',
-      message: 'Are you sure you wanna end this chat?',
-      buttons: [
-        {
-          text: 'No',
-          handler: () => {
-            console.log('No clicked');
+      var self = this;
+
+      let confirm = this.alerCtrl.create({
+        title: 'End Chat',
+        message: 'Are you sure you wanna end this chat?',
+        buttons: [
+          {
+            text: 'No',
+            handler: () => {
+              
+            }
+          },
+          {
+            text: 'Yes',
+            handler: () => {
+              self.dataService.endInteraction(self.chat.callId).subscribe( () => {
+
+              });
+            }
           }
-        },
-        {
-          text: 'Yes',
-          handler: () => {
-            console.log('Yes clicked');
-          }
-        }
-      ]
-    });
-    confirm.present()
+        ]
+      });
+      confirm.present()
   }
 
 
   public chooseOutcome() {
-    let actionSheet = this.actionsheetCtrl.create({
-      title: 'Choose an outcome',
-      cssClass: 'action-sheets-basic-page',
-      buttons: [
-        {
-          text: '1st outcome',
-          role: 'destructive',
+    let self = this;
+    let buttons = [];
+
+    self.dataService.getOutcomes().subscribe( (response) => {
+      let outcomes = response.json();
+      for(let jsonOutcome of outcomes as Array<any>) {
+        let tmp = {
+          text: jsonOutcome['name'],
           handler: () => {
-            console.log('1st outcome clicked');
-          }
-        },
-        {
-          text: '2nd outcome',
-          handler: () => {
-            console.log('1st outcome clicked');
-          }
-        },
-        {
-          text: '3rd outcome',
-          handler: () => {
-            console.log('3rd outcome clicked');
-          }
-        },
-        {
-          text: '4th outcome',
-          handler: () => {
-            console.log('4th outcome clicked');
-          }
-        },
-        {
-          text: 'Cancel',
-          role: 'cancel', // will always sort to be on the bottom
-          icon: !this.platform.is('ios') ? 'close' : null,
-          handler: () => {
-            console.log('Cancel clicked');
-          }
+            let id = jsonOutcome['id'];
+            self.dataService.submitOutcome(self.chat.callId, id).subscribe(() => {
+              self.chat.outcomeSubmitted = true;
+            });
+          }  
         }
-      ]
+        buttons.push(tmp);
+      }
+      buttons.push({
+        text: 'Cancel',
+        role: 'cancel', // will always sort to be on the bottom
+        icon: !this.platform.is('ios') ? 'close' : null,
+        handler: () => {
+          console.log('Cancel clicked');
+        }
+      });
+      let actionSheet = this.actionsheetCtrl.create({
+        title: 'Choose an outcome',
+        cssClass: 'action-sheets-basic-page',
+        buttons: buttons
+      });
+      actionSheet.present();
     });
-    actionSheet.present();
+
     }
 
 

@@ -2,7 +2,7 @@
   <ion-navbar color="primary">
     <ion-title>{{chat.userFullname}}</ion-title>
 
-    <ion-buttons end>
+    <ion-buttons *ngIf="chat.status != 'wrapup'" end>
       <button ion-button icon-only (click)="doConfirmEndChat()">
         <ion-icon name="close"></ion-icon>
       </button>
@@ -33,10 +33,10 @@
 
 <ion-footer>
   <ion-toolbar>
-    <button ion-button block (click)="chooseOutcome()">
+    <button *ngIf="chat.status == 'wrapup' && !chat.outcomeSubmitted" ion-button block (click)="chooseOutcome()">
       Choose Outcome
     </button>
-    <ion-list>
+    <ion-list *ngIf="chat.status != 'wrapup'">
       <ion-item>
         <!--<ion-input #messageInput (click)="setFocus()" type="text" autofocus name="message" id="message" placeholder="Enter your msg" [(ngModel)]="currentMessage"></ion-input> -->
         <input class="text-input" type="text" name="message" id="message" placeholder="Enter your msg" [(ngModel)]="currentMessage"/>

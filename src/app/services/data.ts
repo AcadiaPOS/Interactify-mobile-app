@@ -39,6 +39,27 @@ export class DataService {
         return null;
     }
 
+    public endInteraction(callId: String) {
+        let options = new RequestOptions({
+            withCredentials: true
+        });
+        return this.$http.get("https://interactify.io/im/chat/end?interactionId=" + callId,options);            
+    }
+
+    public getOutcomes() {
+        let options = new RequestOptions({
+            withCredentials: true
+        });
+        return this.$http.get("https://interactify.io/im/outcomes",options);                    
+    }
+
+    public submitOutcome(callId: String, outcomeId: String) {
+        let options = new RequestOptions({
+            withCredentials: true
+        });
+        return this.$http.get("https://interactify.io/im/outcome?outcomeId="+outcomeId+"&callId="+callId+"&notes=",options);    
+    }
+
     public acceptPersistentInteraction(callId: String, type: String) {
         let options = new RequestOptions({
             withCredentials: true

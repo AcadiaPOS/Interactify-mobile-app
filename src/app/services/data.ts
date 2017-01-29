@@ -5,6 +5,7 @@ import { CallEvent } from '../../app/models/callevent';
 import { Chat } from '../../app/models/chat';
 import { Message } from '../../app/models/message';
 import { HistoryEntry } from '../../app/models/historyentry';
+import { Settings } from '../../app/models/settings';
 import { Platform } from 'ionic-angular';
 import { Observable,Subject } from 'rxjs/Rx';
 import { ReconnectingWebSocket } from '../../app/services/ReconnectingWebSocket';
@@ -20,6 +21,8 @@ export class DataService {
     public chatsSubject: Subject<Array<Chat>> = new Subject<Array<Chat>>();
     public historySubject: Subject<Array<HistoryEntry>> = new Subject<Array<HistoryEntry>>();
     public scrollUpdateSubject: Subject<any> = new Subject();
+    public channelDieSubject: Subject<String> = new Subject<String>();
+    public settings: Settings = new Settings();
     public hostname = "manage.interactify.io";
     public baseUri = "https://" + this.hostname;
 
@@ -48,6 +51,15 @@ export class DataService {
         });
         return this.$http.get(this.baseUri+"/im/chat/end?interactionId=" + callId,options);            
     }
+
+    public endWrapup(channelPid: String) {
+        let options = new RequestOptions({
+            withCredentials: true
+        });
+        return this.$http.get(this.baseUri+"/im/endwrapup?channelPid=" + channelPid,options).subscribe(() => {
+
+        });            
+    }    
 
     public getOutcomes() {
         let options = new RequestOptions({
@@ -94,6 +106,7 @@ export class DataService {
                         return value.channelId != chat.channelId;
                     });
                     this.chatsSubject.next(this.chats);
+                    this.channelDieSubject.next(chat.channelId);
                 break;
             default:
                 let interaction = this.findChatByChannelId(channelEvent.id);
@@ -184,7 +197,8 @@ export class DataService {
                 let options = new RequestOptions({
                     withCredentials: true
                 });
-                self.$http.get(self.baseUri+"/im/setstatus?status=available&label=", options).subscribe( result => {
+                self.$http.get(self.baseUri+"/im/mobileinit", options).subscribe( result => {
+                    self.settings.fromJson(result.json());
                     self.push.register().then((t: PushToken) => {
                         var platforms = self.platform.platforms().join(',');
                         return self.$http.get(self.baseUri+"/agent/savetoken?token="+t.token+"&device_type="+platforms).map( result => {

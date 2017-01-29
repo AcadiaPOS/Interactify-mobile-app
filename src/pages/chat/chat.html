@@ -33,6 +33,9 @@
 
 <ion-footer>
   <ion-toolbar>
+    <button *ngIf="chat.status == 'wrapup' && startTimer()" ion-button block (click)="endWrapup()">
+      <span id="miniwup-timer">{{wrapupTime}}</span>&nbsp;<span id="miniwrapuptext">sec left</span>
+    </button>  
     <button *ngIf="chat.status == 'wrapup' && !chat.outcomeSubmitted" ion-button block (click)="chooseOutcome()">
       Choose Outcome
     </button>

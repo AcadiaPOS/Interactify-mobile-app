@@ -4,6 +4,7 @@ import { DataService } from '../../app/services/data';
 import { Chat } from '../../app/models/chat';
 import { Message } from '../../app/models/message';
 import { LoadingController } from 'ionic-angular';
+import { ViewController } from 'ionic-angular';
 import { AlertController } from 'ionic-angular';
 import { Platform, ActionSheetController } from 'ionic-angular';
 
@@ -17,19 +18,42 @@ export class ChatPage {
     chat: Chat;
     currentMessage: String;
     connectionStatus: String;
+    @Input() wrapupTime: Number = -1;
     @ViewChild("mainChat") chatWindow; 
 
-    constructor(public navCtrl: NavController, public navParams: NavParams, public dataService: DataService, public loadingCtrl: LoadingController, public alerCtrl: AlertController, public platform: Platform, public actionsheetCtrl: ActionSheetController) {
+    constructor(public navCtrl: NavController, public navParams: NavParams, public viewController: ViewController, public dataService: DataService, public loadingCtrl: LoadingController, public alerCtrl: AlertController, public platform: Platform, public actionsheetCtrl: ActionSheetController) {
       let self = this;
       self.chat = navParams.get('chat');
       let socket = dataService.reconnectingWebSocket;
       self.connectionStatus = socket.statusFormatted(socket.readyState);
       socket.readyStateSubject.subscribe( value => {
         self.connectionStatus = socket.statusFormatted(value);
-      });      
+      });
+      dataService.channelDieSubject.subscribe( channelId => {
+        if(self.chat.channelId == channelId) {
+          navCtrl.removeView(viewController);
+        }
+      });
       dataService.scrollUpdateSubject.subscribe( () => {
           self.chatWindow.scrollTo(0, 99999, 700);
       });
+    }
+
+    public startTimer() {
+      let wrapupTime = this.dataService.settings.wrapup_time;
+      if(!this.wrapupTime) return false;
+      if(this.wrapupTime == -1) {
+        this.wrapupTime = Number(wrapupTime);
+        setInterval(() => {
+          if(!this.wrapupTime) return false;
+          this.wrapupTime = parseInt(this.wrapupTime.toString()) - 1;
+        }, 1000);
+      }
+      return true;
+    }
+
+    public endWrapup() {
+      this.dataService.endWrapup(this.chat.channelId);
     }
 
     public sendingPopup() {

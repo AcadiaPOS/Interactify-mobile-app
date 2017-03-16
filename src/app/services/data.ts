@@ -1,7 +1,6 @@
 import { Injectable, Inject } from '@angular/core';
 import { Http,Headers,RequestOptions } from "@angular/http";
 import { ChannelEvent } from '../../app/models/channelevent';
-import { CallEvent } from '../../app/models/callevent';
 import { Chat } from '../../app/models/chat';
 import { Message } from '../../app/models/message';
 import { HistoryEntry } from '../../app/models/historyentry';
@@ -82,20 +81,12 @@ export class DataService {
         return this.$http.get(this.baseUri+"/im/calls/persistentaccept?callid=" + callId + "&type=" + type,options);       
     }
 
-    public handleCallEvent(callEvent: CallEvent) {
-        switch ( callEvent.event ) {
-            case 'persistent_prering':
-                    // prering event can either be on voice or on a non-voice interaction
-                    this.acceptPersistentInteraction(callEvent.callId, callEvent.interactionType).subscribe( result => {} );
-                break;
-       }       
-    }
-
    public handleChannelEvent(channelEvent: ChannelEvent) {
         let chat: Chat = new Chat();
         // when the channel is initialized, add a new interaction
         switch(channelEvent.status) {
             case "init":
+                    //alert('New channel:'+channelEvent.id);
                     chat.fromChannelEvent(channelEvent);
                     this.chats.push(chat);
                     this.chatsSubject.next(this.chats);                
@@ -108,9 +99,17 @@ export class DataService {
                     this.chatsSubject.next(this.chats);
                     this.channelDieSubject.next(chat.channelId);
                 break;
+            case "ringing":
+                    let tmp = this.findChatByChannelId(channelEvent.id);
+                    tmp.status = channelEvent.status;   
+                    let type = channelEvent.interactionType == 'chat' ? 'chat_media' : 'freeswitch_media';         
+                    this.acceptPersistentInteraction(channelEvent.callId, type).subscribe( result => {} );
+                break;    
             default:
                 let interaction = this.findChatByChannelId(channelEvent.id);
-                interaction.status = channelEvent.status;  
+                if(interaction) {
+                    interaction.status = channelEvent.status;  
+                }
         }
     }
 
@@ -160,13 +159,7 @@ export class DataService {
     public processMessage(evt) {
         let received_msg = evt.data;
         let data = JSON.parse(received_msg);
-        //alert(received_msg);
         switch(data.message) {
-            case "call_event":
-                    let callEvent: CallEvent = new CallEvent();
-                    callEvent.fromJson(data);    
-                    this.handleCallEvent(callEvent);        
-                break;
             case "channel_event":
                     let channelEvent: ChannelEvent = new ChannelEvent();
                     channelEvent.fromJson(data);
@@ -183,6 +176,9 @@ export class DataService {
             case "agent_status":
                 //alert('agent status message is received');
                 break;
+            case "channel_info":
+                // project ID can be extracted from here
+                break;    
         }
     }
 

@@ -40,6 +40,18 @@ export class ReconnectingWebSocket {
     public onmessage:(ev:MessageEvent) => void = function (event:MessageEvent) {};
     public onerror:(ev:ErrorEvent) => void = function (event:ErrorEvent) {};
 
+    public checkCredentials() {
+        let headers = new Headers();
+        headers.append('Content-Type', 'application/x-www-form-urlencoded');
+        let options = new RequestOptions({
+            headers: headers,
+            withCredentials: true
+        });
+        let username = window.localStorage.getItem("username");
+        let password = window.localStorage.getItem("password");
+        return this.$http.post("https://manage.interactify.io/authcheck","username="+username+"&password="+password,options);        
+    }
+
     public login() {
         let headers = new Headers();
         headers.append('Content-Type', 'application/x-www-form-urlencoded');

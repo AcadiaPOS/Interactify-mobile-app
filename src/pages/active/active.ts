@@ -24,7 +24,7 @@ export class ActivePage {
         self.connectionStatus = socket.statusFormatted(value);
       });       
       dataService.reconnectingWebSocket.checkCredentials().subscribe( result => {
-          dataService.initWebsocket();
+        
       }, err => {
         self.navCtrl.push(LoginPage);
       });    

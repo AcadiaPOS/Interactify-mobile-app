@@ -29,6 +29,8 @@ export class MyApp {
         //alert('Notification:'+msg.title);
       });
 
+      dataService.initWebsocket();
+
       document.addEventListener("pause", () => {
           dataService.reconnectingWebSocket.close();
       });
